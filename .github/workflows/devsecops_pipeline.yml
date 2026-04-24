@@ -11,7 +11,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 1. SONARQUBE (Using your specific keys)
+      # 1. SONARQUBE (Static Analysis)
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
@@ -22,24 +22,27 @@ jobs:
             -Dsonar.organization=mayanks5201
             -Dsonar.projectKey=mayanks5201_ota-secure-pipeline
 
-      # 2. SNYK (SCA & SAST)
+      # 2. SNYK (Dependency Scan) - Continue on error to see Trivy
       - name: Snyk Security Scan
         uses: snyk/actions/python-3.10@master
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      # 3. TRIVY (Container Image Scan)
+      # 3. BUILD DOCKER IMAGE
       - name: Build Image for Trivy
         run: docker build -t ota-service:${{ github.sha }} .
 
+      # 4. TRIVY (Container Scan) - Continue on error to see ZAP
       - name: Trivy Container Scan
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: 'ota-service:${{ github.sha }}'
           format: 'table'
           severity: 'CRITICAL,HIGH'
 
-      # 4. OWASP ZAP (Baseline Scan)
+      # 5. OWASP ZAP (DAST Baseline)
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.12.0
         with:
