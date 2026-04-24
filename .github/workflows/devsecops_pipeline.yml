@@ -11,12 +11,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 1. SONARQUBE (Static Code Quality & Security)
+      # 1. SONARQUBE (Using your specific keys)
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.organization=mayanks5201
+            -Dsonar.projectKey=mayanks5201_ota-secure-pipeline
 
       # 2. SNYK (SCA & SAST)
       - name: Snyk Security Scan
@@ -35,8 +39,8 @@ jobs:
           format: 'table'
           severity: 'CRITICAL,HIGH'
 
-      # 4. OWASP ZAP (DAST - Baseline Scan)
+      # 4. OWASP ZAP (Baseline Scan)
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: 'http://example.com' # Replace with your microservice URL once deployed
+          target: 'http://example.com'
