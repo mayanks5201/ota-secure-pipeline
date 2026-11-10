@@ -12,7 +12,7 @@ def download_firmware(version, filename):
     target_path = os.path.join("/tmp/updates/", filename)
     
     print(f"Fetching version {version} from {BACKEND_URL}")
-    response = requests.get(f"{BACKEND_URL}/get?file={filename}")
+    response = requests.get(f"{BACKEND_URL}/get?file={filename}") //
     
     with open(target_path, "wb") as f:
         f.write(response.content)
